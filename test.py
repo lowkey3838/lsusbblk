@@ -3,6 +3,7 @@
 
 def main():
     print("Hello World")
+    print("Now updated")
 
 
 if __name__ == "__main__":

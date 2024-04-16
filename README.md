@@ -1,18 +1,34 @@
 # lsusbblk
 
-lsusblk - is a command line linux tool to list block devices connected to a USB port on the computer. The tool is intended to be used interactively and also for use in scripts.
+**lsusbblk** is the result of a personal itch to simplify know more about the attached
+usb block devices (*usb memmory sticks or disks*) that has been connected to the computer.
+The ultimate goal has been to identify the device and what the device claimes to be as 
+opposed to what the device has negotiated to operate with the operating system.
 
----
+The application is a command line utility that displays information to the user about The
+connected usb block devices. It can also be used to wait for the next device to be attached.
+This can be very usefull is you inted to do some destructive operation on the device such as 
+a reformating.
 
-'lsusbblk -f'
+The application is also created to be easy to utilise in shell scripting.
 
-This comnman will do a blocking wait until the user connects a usb block device, thumbdrive, to the computer and then return the device it was connected to.
+# Usage example
+user@computer:~/$ lsusbblk -l
+ 
+DEVICE   | USBVER  | VENDOR | MODEL   | ID        | SIZE | SERIAL       | LABEL | 
+-------- + ------- + ------ + ------- + --------- + ---- + ------------ + ----- + 
+/dev/sdd | USB 3.2 | ROG    | ESD-S1C | 0b05:1932 | 0    | MBD0AP009494 | None  | 
 
----
+# Application installation
 
-'lsusbblk -q -f'
+## Application dependencies
 
-The command can also be used in scripts such as bash to for an example make sure that only the most reasonly added usb block device is used in the script.
+python3-colorama
+python3-pyusb
+
+# Development setup
+
+'sudo dnf install @development-tools rpmdevtools'
 
 
 

@@ -12,7 +12,9 @@ a reformating.
 
 The application is also created to be easy to utilise in shell scripting.
 
-# Usage example
+## Usage example
+
+### Display more about the device to the user
 ```bash
 user@computer:~/$ lsusbblk -l
  
@@ -21,14 +23,26 @@ DEVICE   | USBVER  | VENDOR | MODEL   | ID        | SIZE | SERIAL       | LABEL 
 /dev/sdd | USB 3.2 | ROG    | ESD-S1C | 0b05:1932 | 0    | MBD0AP009494 | None  | 
 ```
 
-# Application installation
+### Return a JSON formated string
+```bash
+user@computer:~/$ lsusbblk -l -J
+{"/dev/sdd":{"device":"/dev/sdd","usbver":"USB 3.2","vendor":"ROG","model":"ESD-S1C","id":"0b05:1932","size":"0","serial":"MBD0AP009494","label":"None"}}
+```
 
-## Application dependencies
+### Wait for new device and display de device as a string
+```bash
+user@computer:~/$ lsusbblk -f -q -p device
+/dev/sdd
+```
+
+## Application installation
+
+### Application dependencies
 
 python3-colorama
 python3-pyusb
 
-# Development setup
+## Development setup
 
 'sudo dnf install @development-tools rpmdevtools'
 

@@ -35,14 +35,14 @@ user@computer:~/$ lsusbblk -f -q -p device
 /dev/sdd
 ```
 
-## Application installation
+# Application installation
 
-### Application dependencies
+## Application dependencies
 
 python3-colorama
 python3-pyusb
 
-## Development setup
+# Development setup
 
 'sudo dnf install @development-tools rpmdevtools'
 

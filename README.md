@@ -41,6 +41,9 @@ user@computer:~/$ lsusbblk -f -q -p device
 
 python3-colorama
 python3-pyusb
+python3-flake8
+python3-pylint
+python3-mypy
 
 # Development setup
 Clone the git hub repository to your local repository.
@@ -48,6 +51,7 @@ Clone the git hub repository to your local repository.
 git clone git@github.com:lowkey3838/lsusbblk.git
 ```
 
+'sudo dnf install rpmlint'
 'sudo dnf install @development-tools rpmdevtools'
 
 

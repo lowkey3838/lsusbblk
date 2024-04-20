@@ -43,6 +43,10 @@ python3-colorama
 python3-pyusb
 
 # Development setup
+Clone the git hub repository to your local repository.
+```bash
+git clone git@github.com:lowkey3838/lsusbblk.git
+```
 
 'sudo dnf install @development-tools rpmdevtools'
 

@@ -1,0 +1,425 @@
+#!/usr/bin/python3 -s
+"""
+    lsusbblk Utility for listing attached USB block devices
+
+    Copyright (C) 2024 Olof Söderström <olof.soderstrom@bahnhof.se>
+
+    lsusbblk is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, version 3 of the License.
+
+    lsusbblk is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+ -*- Mode: Python; coding: utf-8; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-
+
+-----------------------------------------------------------------------------
+"""
+
+import os
+import re
+import sys
+import pwd
+import shutil
+import time
+import urllib.request
+import colorama
+from colorama import Fore, Back, Style
+from argparse import ArgumentParser
+from lib.usbblk import usbblk as USBBLK  # USB block device class
+from lib.usbblk import usbids as USBIDS  # USB id file class
+from lib.confutil import Version as Ver  # Version string handling
+import lib.output as op
+
+__author__ = "Olof Söderström"
+__copyright__ = "Copyright 2024"
+__credits__ = ["All gigants gone before me"]
+__license__ = "GPLv3"
+__version__ = "1.0.9"
+__email__ = "olof.soderstrom@bahnhof.se"
+
+
+def main():
+
+    # Default properties shown in compact listing and long listing
+    sprop = ["device", "vendor", "model", "size", "label"]
+    lprop = ["device", "usbver", "vendor", "model", "id", "size", "serial", "label"]
+
+    def p(line):
+        """Print line unless line empty"""
+
+        # Minimum resulting line length is 65 character
+        dots = " ... "
+        l_size = max(int((columns - len(dots)) / 2), 30)
+        r_size = max(columns - l_size - len(dots), 30)
+        if line != "":
+            if len(line) <= columns:
+                print(line)
+            else:
+                # if terminal is to narrow shorten line
+                print(line[:l_size] + dots + line[-r_size:])
+
+    def quiet(line):
+        """if quiet return empty string"""
+        if args.quiet:
+            return ""
+        else:
+            return line
+
+    def monochrome(c, line):
+        """if monochrome return clean string"""
+        if args.monochrome:
+            return line
+        else:
+            return c + line
+
+    """ colour control """
+
+    def blue(line):
+        return monochrome(Fore.BLUE, line)
+
+    def red(line):
+        return monochrome(Fore.RED, line)
+
+    def green(line):
+        return monochrome(Fore.GREEN, line)
+
+    def yellow(line):
+        return monochrome(Fore.YELLOW, line)
+
+    def magenta(line):
+        return monochrome(Fore.MAGENTA, line)
+
+    def cyan(line):
+        return monochrome(Fore.CYAN, line)
+
+    def reset(line):
+        return monochrome(Fore.RESET, line)
+
+    def label(label, size, pos, div):
+        """adjust lable in fixed string"""
+        if pos == "l":
+            template = "{:<" + str(size) + "} " + div + " "
+        else:
+            template = "{:>" + str(size) + "} " + div + " "
+        return template.format(label)
+
+    def col(l, label_size, div):
+        """format column string"""
+        return label(l, label_size, "l", div)
+
+    def print_line(property, property_size, value, i):
+        """present property line"""
+        tmpl = "{:<" + "{}".format(str(property_size)) + "} : "
+        p(" " * i + green(tmpl.format(property.upper())) + yellow(str(value)))
+
+    def print_detailed(dev_list, get_all_prop, only_device=None):
+        """present detailed properties"""
+        prop_max_size = 0
+        for pr in get_all_prop:
+            prop_max_size = max(prop_max_size, len(pr))
+
+        for d in dev_list:
+            i = 0
+            for pr in d.get_labels():
+                print_line(pr, prop_max_size, d.get(pr), i)
+                i = 8
+
+    def print_tabel(dev_list, prop_sizes):
+        """present result in table format"""
+        header = ""
+        devider = ""
+        p(quiet(" "))
+        for pr in prop:
+            header = header + col(pr.upper(), prop_sizes(pr), "|")
+            devider = devider + col("-" * prop_sizes(pr), prop_sizes(pr), "+")
+        p(quiet(green(header)))
+        p(quiet(green(devider)))
+        for d in dev_list:
+            result = ""
+            for pr in prop:
+                result = result + col(d.get(pr), prop_sizes(pr), "|")
+            p(green(result))
+        p(quiet(" "))
+
+    def print_quiet(dev_list, only_device=None):
+        for d in dev_list:
+            result = ""
+            for pr in prop:
+                result += d.get(pr) + " "
+            p(result)
+
+    def display_devices(devices, only_device=None):
+        dev_list = []
+        if only_device is None:
+            dev_list = devices.get_devices()
+        else:
+            dev_list.append(devices.get(only_device))
+
+        if args.quiet:
+            if args.json:
+                print(devices.serialise(prop, only_device))
+            else:
+                print_quiet(dev_list, only_device)
+        else:
+            if args.verbose:
+                print_detailed(dev_list, list(devices.get_all_prop()), only_device)
+            else:
+                print_tabel(dev_list, devices.get_label_size_of_key)
+
+    """ ################# main ################## """
+
+    prgname = os.path.basename(__file__)
+    version = Ver(__version__)
+
+    colorama.init(autoreset=True)
+
+    columns, rows = shutil.get_terminal_size()
+    # rows, columns = os.popen("stty size", "r").read().split()
+    rows = int(rows)
+    columns = int(columns)
+
+    try:
+        # Command line options
+        ap = ArgumentParser(
+            description="Detailed options description for lsusbblk",
+            epilog="Created by Olof Söderström 2021",
+        )
+
+        # Behaviour switches
+        beh = ap.add_argument_group("behaviour switches")
+        beh.add_argument("-V", "--version", help="Program version", action="store_true")
+        beh.add_argument(
+            "-L", "--list", help="Lists available properties", action="store_true"
+        )
+        beh.add_argument(
+            "-N", "--nodevices", help="Number of devices", action="store_true"
+        )
+        beh.add_argument(
+            "-f", "--follow", help="Wait for new device", action="store_true"
+        )
+        beh.add_argument(
+            "-u", "--usblist", help="Download USB id list", action="store_true"
+        )
+
+        # Presentation switches
+        pre = ap.add_argument_group("presentation switches")
+        pre.add_argument("-l", "--long", help="Long output", action="store_true")
+        pre.add_argument("-q", "--quiet", help="Quiet output", action="store_true")
+        pre.add_argument("-v", "--verbose", help="Verbose output", action="store_true")
+        pre.add_argument(
+            "-s", "--scientific", help="Non-human friendly", action="store_true"
+        )
+        pre.add_argument(
+            "-J", "--json", help="Display out in JSON", action="store_true"
+        )
+        pre.add_argument(
+            "-M", "--monochrome", help="Display monochrome text", action="store_true"
+        )
+        pre.add_argument("-d", "--debug", help="Debug", action="store_true")
+
+        prv = ap.add_argument_group("presentation values")
+        prv.add_argument("-D", "--device", help="Display device", type=str)
+        prv.add_argument("-p", "--properties", help="Properties to display", type=str)
+
+        args = ap.parse_args()
+
+        # Check existans of USB id list file
+        usbids = USBIDS()
+        if not usbids.file_is_loaded():
+            p(
+                quiet(
+                    yellow(
+                        "No USB id file "
+                        + "/usr/share/hwdata/usb.ids not found. "
+                        + "Try to download file using --usblist argument."
+                    )
+                )
+            )
+
+        # Download list of USB id and quit
+        if args.usblist:
+            p(quiet(yellow("Trying to download new USB id list")))
+            try:
+                urllib.request.urlretrieve(
+                    "http://www.linux-usb.org/usb.ids", "usb.ids"
+                )
+                p(quiet(green("New list downloaded")))
+            except urllib.request.ContentTooShortError:
+                p(quiet(red("Error: Transfer interrupted")))
+            except urllib.error.URLError:
+                p(quiet(red("Error: Host not found")))
+            sys.exit(0)
+
+        # Enumerate connected connected USB block devices
+        current_devices = USBBLK(not args.scientific)
+
+        # If long output is requested
+        if args.long:
+            prop = lprop
+        else:
+            prop = sprop
+
+        # If quiet requested make output monochrome
+        if args.quiet:
+            args.monochrome = True
+
+        # If json requested make output quiet and monochrome
+        if args.json:
+            args.monochrome = True
+            args.quiet = True
+
+        # Print program, version and exit
+        if args.version:
+            p(green(prgname + " " + str(version)))
+            sys.exit(0)
+
+        # Print available properties and exit
+        if args.list:
+            p(
+                quiet(
+                    green(
+                        "These are the properties that can be used to "
+                        + "define output:"
+                    )
+                )
+            )
+            proplist = list(current_devices.get_all_prop())
+            print(green(str(proplist)))
+            sys.exit(0)
+
+        # If given devices not present then exit
+        if args.device:
+            if args.device not in current_devices.get_device_list():
+                p(red(f"USB block devices not found: {args.device}"))
+                sys.exit(1)
+
+        # If enumerate devices present and exit
+        if args.nodevices:
+            p(
+                quiet(green("Number USB block devices found: "))
+                + green(str(current_devices.number_of()))
+            )
+            sys.exit(0)
+
+        # If change of properties to be presented
+        if args.properties:
+            # remove ',' and surplus white spaces
+            args.properties = args.properties.replace(",", " ")
+            args.properties = re.sub(r"\s+", " ", args.properties)
+            prop = list(args.properties.split(" "))
+
+        # If scientific do not show numerical values in human readable form
+        if args.scientific:
+            pass
+
+        """ ################ initial checks ################### """
+        # Check prop definition
+        for pr in prop:
+            if pr not in current_devices.get_all_prop():
+                p(red(f"Unknown property: '{pr}'', use -L to list valid properties"))
+                sys.exit(1)
+
+        """ ################ execute command ################## """
+        # If zero devices present fact
+        if current_devices.is_empty():
+            p(quiet(red("No USB block devices found")))
+
+        # If Debug
+        if args.debug:
+            current_devices.debug()
+
+        # Table presentation or detailed presentation
+        if not (args.follow and args.quiet) and not current_devices.is_empty():
+            if args.device:
+                display_devices(current_devices, args.device)
+            else:
+                display_devices(current_devices)
+
+        # If follow is select
+        if args.follow:
+            current_list = current_devices.get_device_list()
+            p(quiet(green("Waiting for new device...")))
+            while True:
+                current_devices = USBBLK(not args.scientific)
+                new_list = current_devices.get_device_list()
+                delete_list = list(set(current_list) - set(new_list))
+                added_list = list(set(new_list) - set(current_list))
+                if int(len(new_list) - len(current_list)) < 0:
+                    p(quiet(red("Device removed: " + str(delete_list[0]))))
+                    current_list = new_list
+                if added_list:
+                    p(quiet(green("Device added: ") + str(added_list)))
+                    break
+                time.sleep(0.5)
+            display_devices(current_devices, str(added_list[0]))
+
+        # Notify user if user not root or part of disk group
+        # uid, gid = os.geteuid(), os.getegid()
+        uid = os.geteuid()
+        impersonated_username = pwd.getpwuid(uid)[0]
+        grouplist = os.getgrouplist(impersonated_username, os.getegid())
+        if not ((0 in grouplist) or (6 in grouplist)):
+            p(
+                quiet(
+                    yellow(
+                        "Note: The effective user is not root or part "
+                        + "of disk group. Size can not be presented."
+                    )
+                )
+            )
+            p(
+                quiet(
+                    yellow(
+                        "      USB version, speed, bus and address may "
+                        + " not be presented"
+                    )
+                )
+            )
+            p(quiet(yellow("")))
+
+        sys.exit(0)
+
+    except KeyboardInterrupt:
+        sys.exit(0)
+    else:
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
+
+
+"""
+
+https://www.usb.org/defined-class-codes
+
+00h	Device	Use class information in the Interface Descriptors
+01h	Interface	Audio
+02h	Both	Communications and Communications Device Class (CDC) Control
+03h	Interface	Human Interface Device (HID)
+05h	Interface	Physical
+06h	Interface	Image
+07h	Interface	Printer
+08h	Interface	Mass Storage (MSD)
+09h	Device	8Hub
+0Ah	Interface	CDC-Data
+0Bh	Interface	Smart Card
+0Dh	Interface	Content Security
+0Eh	Interface	Video
+0Fh	Interface	Personal Healthcare
+10h	Interface	Audio/Video Devices
+11h	Device	Billboard Device Class
+DCh	Both	Diagnostic Device
+0Eh	Interface	Wireless Controller
+EFh	Both	Miscellaneous
+FEh	Interface	Application Specific
+FFh	Both	Vendor Specific
+
+
+"""

@@ -33,9 +33,12 @@ else
 	RELEASE:=$(strip $(shell svn info --show-item revision $(SPECTEMPL) | tr -d '\n'))
 endif
 
-LIBSRC:=lib/usbblk.py lib/confutil.py lib/formatutil.py
-PYSRC:=$(NAME) $(LIBSRC)
-SRC:=Makefile README CHANGELOG NEWS LICENSE lsusbblk.1 $(PYSRC)
+SRC:=src
+DOC:=doc
+LIBSRC:=$(SRC)lib/usbblk.py $(SRC)lib/confutil.py $(SRC)lib/formatutil.py
+PYSRC:=$(SRC)$(NAME) $(LIBSRC)
+####SRC:=Makefile README CHANGELOG NEWS LICENSE lsusbblk.1 $(PYSRC)
+SRC:=Makefile README.md LICENSE $(DOC)lsusbblk.1 $(PYSRC)
 RES:=$(SPEC) lsusbblk.1.gz REL
 RPM_TARG:=RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
 

@@ -35,14 +35,18 @@ user@computer:~/$ lsusbblk -f -q -p device
 /dev/sdd
 ```
 
-## Application installation
+# Application installation
 
-### Application dependencies
+## Application dependencies
 
 python3-colorama
 python3-pyusb
 
-## Development setup
+# Development setup
+Clone the git hub repository to your local repository.
+```bash
+git clone git@github.com:lowkey3838/lsusbblk.git
+```
 
 'sudo dnf install @development-tools rpmdevtools'
 

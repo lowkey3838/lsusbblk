@@ -1,0 +1,147 @@
+.\" 
+.\" $Date$
+.\" $Id: lsusbblk.1 18 2022-01-02 14:29:53Z olof $ 
+.\"
+.TH "lsusbblk" "1" "2021" "Olof Söderström" "Systems administration"
+
+.SH "NAME"
+lsusbblk \- list USB block devices
+.SH "SYNOPSIS"
+lsusbblk [OPTIONS]
+.TP 
+[OPTIONS]: [-h] [-V] [-L] [-N] [-f] [-u] [-l] [-q] [-v] [-s] [-J] [-M] [-d] [-D DEVICE] [-p PROPERTIES_LIST]
+
+.SH "DESCRIPTION"
+\fBlsusbblk\fP is a command line program that lists attached USB block devices such as USB memory sticks or USB external disks. The purpose of the program is to simplify the identification of attached USB block devices. The program has the option to wait for a device to be attached and show device information. The program will by default display a sub set of all available properties. The program can also be used to retrieve a specific value or several values from a specified device.
+
+.SH "OPTIONS"
+.PP 
+The following options are recognized:
+
+.PP 
+.TP 5
+\fB\-\-device\fP, \fB\-D\fP DEVICE 
+
+Display information only for given device. 
+.PP 
+.TP 5
+\fB\-\-list\fP, \fB\-L\fP
+
+List available properties
+.PP 
+.TP 5
+\fB\-\-nodevices\fP, \fB\-N\fP
+
+Return number of attached USB block devices
+.PP 
+.TP 5
+\fB\-\-follow\fP, \fB\-f\fP
+
+Display attached USB block devices and then wait for new device to be attached. Display the new device and then exit.
+.PP 
+.TP 5
+\fB\-\-usblist\fP, \fB\-u\fP
+
+Download USB id list from "http://www.linux-usb.org/usb.ids". This list is used to match VID and PID to text representations of the device. 
+.PP 
+.TP 5
+\fB\-\-verbose\fP, \fB\-v\fP
+
+Display all properties of attached USB block devices. 
+.PP 
+.TP 5
+\fB\-\-properties\fP, \fB\-p\fP PROPERTIES_LIST
+
+Display all properties of attached USB block devices. 
+.PP 
+.TP 5
+\fB\-\-scientific\fP, \fB\-s\fP
+
+Display device size in bytes. 
+.PP 
+.TP 5
+\fB\-\-monochrome\fP, \fB\-M\fP
+
+Display all information with monochrome text
+.PP 
+.TP 5
+\fB\-\-long\fP, \fB\-l\fP
+
+Adds more fields to the output
+..PP 
+.TP 5
+\fB\-\-quiet\fP, \fB\-q\fP
+
+Remove all label and support text. Only display results. Quiet output text in monochrome.
+.PP 
+.TP 5
+\fB\-\-json\fP, \fB\-J\fP
+Remove all label and support text. Only display results in JSON. JSON output text in monochrome.
+.PP 
+.TP 5
+\fB\-\-debug\fP, \fB\-d\fP
+
+This option enables debug information to be printed. 
+ 
+.PP 
+.TP 5
+\fB\-\-version\fP, \fB\-V\fP
+
+Shows the version of the program and exit.
+.PP 
+.TP 5
+\fB\-\-help\fP, \fB\-h\fP, \fB\-?\fP
+
+Displays a usage summary and exits.
+
+.SH "ERRORS"
+The program will produce an error if non-existing device is given with the --device parameter
+.SH "EXIT STATUS"
+.IP
+0.   Successful program execution
+
+1.   Program exited with an error
+
+.SH "EXAMPLE"
+.SS "Default behaviour"
+\fBlsusbblk\fP 
+
+Results in either "No USB block devices found or a list of attached USB block devices with default properties displayed.
+
+.SS "Wait for new device to be attached" 
+\fBlsusbblk \-\-follow\fP 
+
+The program will present currently attached devices and then wait for a new device to be attached. If a device is removed the device name will be presented and the program will continue to wait for a new device. When a device is detected then the device will be resented and the program exits.
+
+.SS "Display selected properties" 
+\fBlsusbblk \-\-properties "device driver vendor_enc model_enc revision pid vid serial_long chksum"\fP 
+
+The program will present currently attached devices with the given properties.
+
+.SS "Display a specific property for a specific device" 
+\fBlsusbblk \-\-device /dev/sdc \-\-properties "chksum" \-\-quiet\fP 
+
+The program will present the computed checksum of the devices properties, see NOTES, and exit. This could for instance be used in a shell script.
+
+.SS "Display newly inserted device by name" 
+\fBlsusbblk \-q \-f \-p device\fP 
+
+The program waits for a newly inserted device, present the device name and exit.
+
+.SH "NOTES"
+The property "chksum" is a sha256 checksum of concatenated string representation of the following properties:
+.TP 5
+
+    'bus', 'devtype', 'type', 'driver', 'drive_thumb', 'vendor', 'vendor_enc', 'model', 'model_enc', 'revision', 'size', 'vid', 'pid', 'serial', 'serial_long', 'interfaces', 'interface_num'
+
+.TP 5
+    When displaying devices in the short form and the terminal is to short then the line will be truncated with " ... " line inserted at the middle. This is supported down to a column width of 30 characters.
+
+.SH "SECURITY"
+To execute this command the user needs to be part of the "disk" group or be executed with root privileges.
+.SH "SEE ALSO"
+lsblk(8), udevadm(8) 
+.SH "BUGS"
+No known bugs. Report bugs by e-mail to the author.
+.SH "AUTHORS"
+Olof Söderström (olof.soderstom@bahnhof.se)

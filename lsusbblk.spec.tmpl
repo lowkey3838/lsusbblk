@@ -1,5 +1,4 @@
 #
-# $Id: lsusbblk.spec.tmpl 31 2022-01-13 21:01:58Z olof $
 #
 ###############################################################################
 
@@ -9,10 +8,10 @@ Version: __VERSION__
 Release: __RELEASE__
 License: GPL
 Group: Utilities/System
-URL: http://soderstrom.home
+URL: https://github.com/lowkey3838/lsusbblk.git
 SOURCE0: __TAR__ 
 Vendor: None
-Packager: Olof Söderström <olof.soderstrom@bahnhof.se>
+Packager: Lowkey <public3838@bahnhof.se>
 Requires: python3-colorama python3-pyudev python3-pyusb 
 BuildRequires: python3-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
@@ -36,7 +35,8 @@ make install DESTDIR="$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-%doc README CHANGELOG NEWS LICENSE
+#%doc README CHANGELOG NEWS LICENSE
+%doc README.md LICENSE
 %{prefix}/share/lsusbblk/lsusbblk
 %{prefix}/share/lsusbblk/lib/usbblk.py
 %{prefix}/share/lsusbblk/lib/confutil.py
@@ -54,11 +54,7 @@ if [ ! -e /usr/bin/lsusbblk ] ; then
 fi
 
 %changelog
-* Thu Jan 13 2022 Olof Söderström <olof.soderstrom@bahnhof.se>
-
-- Fixed: check for existing symbolic link in bin dir.
-
-* Sun Jan 2 2022 Olof Söderström <olof.soderstrom@bahnhof.se>
+* Sun Jan 2 2022 Lowkey <public3838@bahnhof.se>
 
 - First version of spec file.
 

@@ -29,7 +29,7 @@ user@computer:~/$ lsusbblk -l -J
 {"/dev/sdd":{"device":"/dev/sdd","usbver":"USB 3.2","vendor":"ROG","model":"ESD-S1C","id":"0b05:1932","size":"0","serial":"MBD0AP009494","label":"None"}}
 ```
 
-### Wait for new device and display de device as a string
+### Wait for new device and display the device as a string
 ```bash
 user@computer:~/$ lsusbblk -f -q -p device
 /dev/sdd

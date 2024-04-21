@@ -1,11 +1,10 @@
 ##################################################################
-# Makefile for building: lsusbblk 
 #
 # Project: lsusbblk
+#
 ##################################################################
 
 ### Internal definitions ###
-
 P="[44m"
 S="[00m"
 print=$P$(1)$S
@@ -16,35 +15,37 @@ define cp_src2targ
   @cp $? $@
 endef
 
-$(warning Current workning directory = $(shell pwd))
+# Setup variables
+NAME      := lsusbblk
+SRC			  := src
+APP       := $(SRC)/$(NAME)
+DOC			  := doc
+VERSION   := $(shell grep ^__version__ $(APP) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
 
-NAME    := lsusbblk
-VERSION :=$(shell grep ^__version__ $(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
+SPEC      := $(NAME).spec
+SPECTEMPL := $(SPEC).tmpl
+TAR       := $(NAME).tgz
 
-SPEC:=$(NAME).spec
-SPECTEMPL:=$(SPEC).tmpl
-TAR:=$(NAME).tgz
+RELEASE   := 1000
 
-# Store RELEASE number in file to survive to the BUILD directory
-# where no svn info exists
-ifneq ($(strip $(shell ls REL 2> /dev/null)),) 
-	RELEASE:=$(strip $(shell cat REL | tr -d '\n'))
-else 
-	RELEASE:=$(strip $(shell svn info --show-item revision $(SPECTEMPL) | tr -d '\n'))
-endif
+LIBSRC    := $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
+PYSRC     := $(APP) $(LIBSRC)
+#SRC       := Makefile README CHANGELOG NEWS LICENSE lsusbblk.1 $(PYSRC)
+SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
+RES       := $(SPEC) lsusbblk.1.gz REL
+RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
+# RPM_TARG := RPMS/noarch/$(NAME)-$(VERSION).noarch.rpm
 
-SRC:=src
-DOC:=doc
-LIBSRC:=$(SRC)lib/usbblk.py $(SRC)lib/confutil.py $(SRC)lib/formatutil.py
-PYSRC:=$(SRC)$(NAME) $(LIBSRC)
-####SRC:=Makefile README CHANGELOG NEWS LICENSE lsusbblk.1 $(PYSRC)
-SRC:=Makefile README.md LICENSE $(DOC)lsusbblk.1 $(PYSRC)
-RES:=$(SPEC) lsusbblk.1.gz REL
-RPM_TARG:=RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
-
+$(warning ------------------------------------------------------------------------------)
+$(warning $(shell pwd))
+$(warning Application = $(NAME))
+$(warning Version = $(VERSION))
 $(warning $(RPM_TARG))
+$(warning ------------------------------------------------------------------------------)
 
-### Commands ###
+##############################################################################
+### Commands                                                               ###
+##############################################################################
 
 .PHONY: all setup clean clean_all lint lint_rpm lint_py install
 
@@ -53,7 +54,8 @@ first: all
 # Store RELEASE number in file to survive to the BUILD directory
 # where no svn info exists
 REL:
-	RELEASE=$(shell svn info --show-item revision $(SPECTEMPL) ) 
+	RELEASE=1000
+	$(warning $(RELEASE))
 	@echo -n $(RELEASE) > ./REL 
 
 setup:
@@ -86,7 +88,7 @@ lint_rpm:
 lint_py:
 	@echo $(call print,"--- lint python ---")
 	flake8 --exit-zero $(PYSRC)
-	pylint $(PYSRC)
+	pylint-3 $(PYSRC)
 	mypy   $(PYSRC)
 
 install:
@@ -94,7 +96,7 @@ install:
 	# /usr/share
 	install -d -m 755 $(DESTDIR)/usr/share/$(NAME)
 	install -d -m 755  $(DESTDIR)/usr/share/$(NAME)/lib
-	install -m 755 $(NAME) $(DESTDIR)/usr/share/$(NAME)/$(NAME)
+	install -m 755 $(APP) $(DESTDIR)/usr/share/$(NAME)/$(NAME)
 	install -m 644 $(LIBSRC) $(DESTDIR)/usr/share/$(NAME)/lib
 	#ln --symbolic $(DESTDIR)/usr/share/$(NAME)/$(NAME) $(DESTDIR)/usr/bin/$(NAME)
 	# /usr/share/man/man1/
@@ -115,11 +117,12 @@ $(TAR): $(SRC) $(RES)
 	@echo $(call p_targ)
 	@tar -czvf $(TAR) $(SRC) $(RES)
 
-$(NAME).1.gz: $(NAME).1
+$(NAME).1.gz: $(DOC)/$(NAME).1
 	@echo $(call p_targ)
-	@gzip -v -c $? > $@
+	# @gzip -v -c $? > $@
+	@gzip -v -c $(DOC)/$(NAME).1 > $@
 
-$(SPEC): $(SPECTEMPL) $(NAME)
+$(SPEC): $(SPECTEMPL) $(APP)
 	@echo $(call p_targ)
 	@cat $(SPECTEMPL) | \
 		sed 's/__NAME__/$(NAME)/g' | \
@@ -129,6 +132,8 @@ $(SPEC): $(SPECTEMPL) $(NAME)
 
 $(RPM_TARG): $(SPEC) $(TAR)
 	@echo $(call p_targ)
+	@echo $(SPEC)
+	@echo $(TAR)
 	@cp $(SPEC) SPECS
 	@cp $(TAR) SOURCES
 	@if [ -s ~/.rpmmacros ];  then \

@@ -26,21 +26,21 @@ SPEC      := $(NAME).spec
 SPECTEMPL := $(SPEC).tmpl
 TAR       := $(NAME).tgz
 
-RELEASE   := 1000
+# Fix me: remove or use as build number?
+RELEASE   := 1
 
 LIBSRC    := $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(APP) $(LIBSRC)
-#SRC       := Makefile README CHANGELOG NEWS LICENSE lsusbblk.1 $(PYSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
 RES       := $(SPEC) lsusbblk.1.gz REL
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
-# RPM_TARG := RPMS/noarch/$(NAME)-$(VERSION).noarch.rpm
 
 $(warning ------------------------------------------------------------------------------)
 $(warning $(shell pwd))
 $(warning Application = $(NAME))
 $(warning Version = $(VERSION))
-$(warning $(RPM_TARG))
+$(warning End product = $(RPM_TARG))
+$(warning The command issued from the command line was: $(MAKECMDGOALS))
 $(warning ------------------------------------------------------------------------------)
 
 ##############################################################################
@@ -75,7 +75,7 @@ clean:
 clean_all: clean
 	@echo $(call print,"--- clean all ---")
 	@rm -frv RPMS
-	@rmdir -v BUILD BUILDROOT SRPMS SPECS SOURCES
+	@rm -frv BUILD BUILDROOT SRPMS SPECS SOURCES
 	@rm -frv .mypy_cache 
 
 lint: lint_rpm lint_py

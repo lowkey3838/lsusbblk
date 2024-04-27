@@ -1,10 +1,12 @@
 ##################################################################
+# Makefile for building: lsusbblk 
 #
 # Project: lsusbblk
 #
 ##################################################################
 
 ### Internal definitions ###
+
 P="[44m"
 S="[00m"
 print=$P$(1)$S
@@ -15,33 +17,31 @@ define cp_src2targ
   @cp $? $@
 endef
 
-# Setup variables
 NAME      := lsusbblk
 SRC			  := src
-APP       := $(SRC)/$(NAME)
 DOC			  := doc
-VERSION   := $(shell grep ^__version__ $(APP) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
-
+MAIN      := $(SRC)/$(NAME)
 SPEC      := $(NAME).spec
 SPECTEMPL := $(SPEC).tmpl
 TAR       := $(NAME).tgz
 
-# Fix me: remove or use as build number?
-RELEASE   := 1
+VERSION := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
+RELEASE := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
 
 LIBSRC    := $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
-PYSRC     := $(APP) $(LIBSRC)
+PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
-RES       := $(SPEC) lsusbblk.1.gz REL
+RES       := $(SPEC) lsusbblk.1.gz
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
 
 $(warning ------------------------------------------------------------------------------)
-$(warning $(shell pwd))
+$(warning Current workning directory = $(shell pwd))
 $(warning Application = $(NAME))
-$(warning Version = $(VERSION))
-$(warning End product = $(RPM_TARG))
-$(warning The command issued from the command line was: $(MAKECMDGOALS))
-$(warning ------------------------------------------------------------------------------)
+$(warning Version     = $(VERSION))
+$(warning Release     = $(RELEASE))
+$(warning SPEC        = $(SPEC))
+$(warning SPECTEMPL   = $(SPECTEMPL))
+$(warning RPM target  = $(RPM_TARG))
 
 ##############################################################################
 ### Commands                                                               ###
@@ -50,13 +50,6 @@ $(warning ----------------------------------------------------------------------
 .PHONY: all setup clean clean_all lint lint_rpm lint_py install
 
 first: all
-
-# Store RELEASE number in file to survive to the BUILD directory
-# where no svn info exists
-REL:
-	RELEASE=1000
-	$(warning $(RELEASE))
-	@echo -n $(RELEASE) > ./REL 
 
 setup:
 	@echo $(call print,"--- setup ---")
@@ -75,7 +68,7 @@ clean:
 clean_all: clean
 	@echo $(call print,"--- clean all ---")
 	@rm -frv RPMS
-	@rm -frv BUILD BUILDROOT SRPMS SPECS SOURCES
+	@rmdir -v BUILD BUILDROOT SRPMS SPECS SOURCES
 	@rm -frv .mypy_cache 
 
 lint: lint_rpm lint_py
@@ -96,7 +89,7 @@ install:
 	# /usr/share
 	install -d -m 755 $(DESTDIR)/usr/share/$(NAME)
 	install -d -m 755  $(DESTDIR)/usr/share/$(NAME)/lib
-	install -m 755 $(APP) $(DESTDIR)/usr/share/$(NAME)/$(NAME)
+	install -m 755 $(MAIN) $(DESTDIR)/usr/share/$(NAME)/$(NAME)
 	install -m 644 $(LIBSRC) $(DESTDIR)/usr/share/$(NAME)/lib
 	#ln --symbolic $(DESTDIR)/usr/share/$(NAME)/$(NAME) $(DESTDIR)/usr/bin/$(NAME)
 	# /usr/share/man/man1/
@@ -119,10 +112,10 @@ $(TAR): $(SRC) $(RES)
 
 $(NAME).1.gz: $(DOC)/$(NAME).1
 	@echo $(call p_targ)
-	# @gzip -v -c $? > $@
+	#pandoc -f markdown -t man doc/lsusbblk.1.md > doc/lsusbblk.1 
 	@gzip -v -c $(DOC)/$(NAME).1 > $@
 
-$(SPEC): $(SPECTEMPL) $(APP)
+$(SPEC): $(SPECTEMPL) $(MAIN)
 	@echo $(call p_targ)
 	@cat $(SPECTEMPL) | \
 		sed 's/__NAME__/$(NAME)/g' | \

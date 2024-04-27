@@ -51,6 +51,21 @@ Clone the git hub repository to your local repository.
 git clone git@github.com:lowkey3838/lsusbblk.git
 ```
 
+Create a python environment at the project level
+```bash
+python -m venv .
+```
+
+Setting up the build enviorment.
+```bash
+make setup
+```
+
+Create the build enviorment.
+```bash
+make
+```
+
 'sudo dnf install rpmlint'
 'sudo dnf install @development-tools rpmdevtools'
 

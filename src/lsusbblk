@@ -2,7 +2,7 @@
 """
     lsusbblk Utility for listing attached USB block devices
 
-    Copyright (C) 2024 Olof Söderström <olof.soderstrom@bahnhof.se>
+    Copyright (C) 2024 Lowkey <public3838@bahnhof.se>
 
     lsusbblk is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
@@ -30,18 +30,19 @@ import time
 import urllib.request
 import colorama
 from colorama import Fore, Back, Style
-from argparse import ArgumentParser
+from lib.conf import conf  # Retrieve configuration inkl command line options
 from lib.usbblk import usbblk as USBBLK  # USB block device class
 from lib.usbblk import usbids as USBIDS  # USB id file class
 from lib.confutil import Version as Ver  # Version string handling
-import lib.output as op
 
-__author__ = "Olof Söderström"
+# import lib.output as op
+
+__author__ = "Lowkey"
 __copyright__ = "Copyright 2024"
 __credits__ = ["All gigants gone before me"]
 __license__ = "GPLv3"
 __version__ = "1.0.9"
-__email__ = "olof.soderstrom@bahnhof.se"
+__email__ = "public3838@bahnhof.se"
 
 
 def main():
@@ -66,14 +67,14 @@ def main():
 
     def quiet(line):
         """if quiet return empty string"""
-        if args.quiet:
+        if cf.quiet:
             return ""
         else:
             return line
 
     def monochrome(c, line):
         """if monochrome return clean string"""
-        if args.monochrome:
+        if cf.monochrome:
             return line
         else:
             return c + line
@@ -161,13 +162,13 @@ def main():
         else:
             dev_list.append(devices.get(only_device))
 
-        if args.quiet:
-            if args.json:
+        if cf.quiet:
+            if cf.json:
                 print(devices.serialise(prop, only_device))
             else:
                 print_quiet(dev_list, only_device)
         else:
-            if args.verbose:
+            if cf.verbose:
                 print_detailed(dev_list, list(devices.get_all_prop()), only_device)
             else:
                 print_tabel(dev_list, devices.get_label_size_of_key)
@@ -180,54 +181,14 @@ def main():
     colorama.init(autoreset=True)
 
     columns, rows = shutil.get_terminal_size()
-    # rows, columns = os.popen("stty size", "r").read().split()
     rows = int(rows)
     columns = int(columns)
 
     try:
-        # Command line options
-        ap = ArgumentParser(
-            description="Detailed options description for lsusbblk",
-            epilog="Created by Olof Söderström 2021",
+        # Retrieve command line swithes and options
+        cf = conf(
+            name=prgname, version=version, author=__author__, copyright=__copyright__
         )
-
-        # Behaviour switches
-        beh = ap.add_argument_group("behaviour switches")
-        beh.add_argument("-V", "--version", help="Program version", action="store_true")
-        beh.add_argument(
-            "-L", "--list", help="Lists available properties", action="store_true"
-        )
-        beh.add_argument(
-            "-N", "--nodevices", help="Number of devices", action="store_true"
-        )
-        beh.add_argument(
-            "-f", "--follow", help="Wait for new device", action="store_true"
-        )
-        beh.add_argument(
-            "-u", "--usblist", help="Download USB id list", action="store_true"
-        )
-
-        # Presentation switches
-        pre = ap.add_argument_group("presentation switches")
-        pre.add_argument("-l", "--long", help="Long output", action="store_true")
-        pre.add_argument("-q", "--quiet", help="Quiet output", action="store_true")
-        pre.add_argument("-v", "--verbose", help="Verbose output", action="store_true")
-        pre.add_argument(
-            "-s", "--scientific", help="Non-human friendly", action="store_true"
-        )
-        pre.add_argument(
-            "-J", "--json", help="Display out in JSON", action="store_true"
-        )
-        pre.add_argument(
-            "-M", "--monochrome", help="Display monochrome text", action="store_true"
-        )
-        pre.add_argument("-d", "--debug", help="Debug", action="store_true")
-
-        prv = ap.add_argument_group("presentation values")
-        prv.add_argument("-D", "--device", help="Display device", type=str)
-        prv.add_argument("-p", "--properties", help="Properties to display", type=str)
-
-        args = ap.parse_args()
 
         # Check existans of USB id list file
         usbids = USBIDS()
@@ -243,7 +204,10 @@ def main():
             )
 
         # Download list of USB id and quit
-        if args.usblist:
+        if cf.usblist:
+            raise NotImplementedError(
+                "Fixme: Make sure that download is done with least priv..."
+            )
             p(quiet(yellow("Trying to download new USB id list")))
             try:
                 urllib.request.urlretrieve(
@@ -257,30 +221,30 @@ def main():
             sys.exit(0)
 
         # Enumerate connected connected USB block devices
-        current_devices = USBBLK(not args.scientific)
+        current_devices = USBBLK(not cf.scientific)
 
         # If long output is requested
-        if args.long:
+        if cf.long:
             prop = lprop
         else:
             prop = sprop
 
         # If quiet requested make output monochrome
-        if args.quiet:
-            args.monochrome = True
+        if cf.quiet:
+            cf.monochrome = True
 
         # If json requested make output quiet and monochrome
-        if args.json:
-            args.monochrome = True
-            args.quiet = True
+        if cf.json:
+            cf.monochrome = True
+            cf.quiet = True
 
         # Print program, version and exit
-        if args.version:
+        if cf.version:
             p(green(prgname + " " + str(version)))
             sys.exit(0)
 
         # Print available properties and exit
-        if args.list:
+        if cf.list:
             p(
                 quiet(
                     green(
@@ -294,13 +258,13 @@ def main():
             sys.exit(0)
 
         # If given devices not present then exit
-        if args.device:
-            if args.device not in current_devices.get_device_list():
-                p(red(f"USB block devices not found: {args.device}"))
+        if cf.device:
+            if cf.device not in current_devices.get_device_list():
+                p(red(f"USB block devices not found: {cf.device}"))
                 sys.exit(1)
 
         # If enumerate devices present and exit
-        if args.nodevices:
+        if cf.nodevices:
             p(
                 quiet(green("Number USB block devices found: "))
                 + green(str(current_devices.number_of()))
@@ -308,14 +272,14 @@ def main():
             sys.exit(0)
 
         # If change of properties to be presented
-        if args.properties:
+        if cf.properties:
             # remove ',' and surplus white spaces
-            args.properties = args.properties.replace(",", " ")
-            args.properties = re.sub(r"\s+", " ", args.properties)
-            prop = list(args.properties.split(" "))
+            cf.properties = cf.properties.replace(",", " ")
+            cf.properties = re.sub(r"\s+", " ", cf.properties)
+            prop = list(cf.properties.split(" "))
 
         # If scientific do not show numerical values in human readable form
-        if args.scientific:
+        if cf.scientific:
             pass
 
         """ ################ initial checks ################### """
@@ -331,22 +295,22 @@ def main():
             p(quiet(red("No USB block devices found")))
 
         # If Debug
-        if args.debug:
+        if cf.debug:
             current_devices.debug()
 
         # Table presentation or detailed presentation
-        if not (args.follow and args.quiet) and not current_devices.is_empty():
-            if args.device:
-                display_devices(current_devices, args.device)
+        if not (cf.follow and cf.quiet) and not current_devices.is_empty():
+            if cf.device:
+                display_devices(current_devices, cf.device)
             else:
                 display_devices(current_devices)
 
         # If follow is select
-        if args.follow:
+        if cf.follow:
             current_list = current_devices.get_device_list()
             p(quiet(green("Waiting for new device...")))
             while True:
-                current_devices = USBBLK(not args.scientific)
+                current_devices = USBBLK(not cf.scientific)
                 new_list = current_devices.get_device_list()
                 delete_list = list(set(current_list) - set(new_list))
                 added_list = list(set(new_list) - set(current_list))
@@ -383,6 +347,7 @@ def main():
             )
             p(quiet(yellow("")))
 
+        p(yellow("Fix default error and help"))
         sys.exit(0)
 
     except KeyboardInterrupt:

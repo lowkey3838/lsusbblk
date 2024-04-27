@@ -28,7 +28,7 @@ TAR       := $(NAME).tgz
 VERSION := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
 RELEASE := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
 
-LIBSRC    := $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
+LIBSRC    := $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
 RES       := $(SPEC) lsusbblk.1.gz
@@ -112,7 +112,8 @@ $(TAR): $(SRC) $(RES)
 
 $(NAME).1.gz: $(DOC)/$(NAME).1
 	@echo $(call p_targ)
-	#pandoc -f markdown -t man doc/lsusbblk.1.md > doc/lsusbblk.1 
+	# pandoc -s -t man pandoc.1.md -o example10.1
+	# pandoc -f markdown -t man doc/lsusbblk.1.md > doc/lsusbblk.1 
 	@gzip -v -c $(DOC)/$(NAME).1 > $@
 
 $(SPEC): $(SPECTEMPL) $(MAIN)

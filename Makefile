@@ -30,8 +30,9 @@ RELEASE := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\
 
 LIBSRC    := $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
-SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
-RES       := $(SPEC) lsusbblk.1.gz
+#SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
+SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1.md $(PYSRC)
+RES       := $(SPEC) $(DOC)/lsusbblk.1 lsusbblk.1.gz
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
 
 $(warning ------------------------------------------------------------------------------)
@@ -110,10 +111,12 @@ $(TAR): $(SRC) $(RES)
 	@echo $(call p_targ)
 	@tar -czvf $(TAR) $(SRC) $(RES)
 
+$(DOC)/$(NAME).1: $(DOC)/$(NAME).1.md
+	@echo $(call p_targ)
+	pandoc -s -t man $? -o $@
+
 $(NAME).1.gz: $(DOC)/$(NAME).1
 	@echo $(call p_targ)
-	# pandoc -s -t man pandoc.1.md -o example10.1
-	# pandoc -f markdown -t man doc/lsusbblk.1.md > doc/lsusbblk.1 
 	@gzip -v -c $(DOC)/$(NAME).1 > $@
 
 $(SPEC): $(SPECTEMPL) $(MAIN)

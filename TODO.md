@@ -1,7 +1,6 @@
 # Todo 
 
 ## General
-- Cleanup author
 - Add doc strings where applicable
 - Lint all files 
 

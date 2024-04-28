@@ -1,9 +1,6 @@
-# $Id: formatutil.py 91 2022-10-04 20:02:57Z olof $
-#
 # This module defines methods and classes for formating values and strings.
 #
 # formatutil.py
-# Copyright (C) 2020 Olof Söderström <olof.soderstrom@bahnhof.se>
 #
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-
 #
@@ -11,16 +8,24 @@
 
 # see: http://goo.gl/kTQMs
 SYMBOLS = {
-    'customary'     : ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'),
-    'customary_ext' : ('byte', 'kilo', 'mega', 'giga', 'tera', 'peta', 'exa',
-                       'zetta', 'iotta'),
-    'iec'           : ('Bi', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'),
-    'iec_ext'       : ('byte', 'kibi', 'mebi', 'gibi', 'tebi', 'pebi', 'exbi',
-                       'zebi', 'yobi'),
+    "customary": ("B", "K", "M", "G", "T", "P", "E", "Z", "Y"),
+    "customary_ext": (
+        "byte",
+        "kilo",
+        "mega",
+        "giga",
+        "tera",
+        "peta",
+        "exa",
+        "zetta",
+        "iotta",
+    ),
+    "iec": ("Bi", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"),
+    "iec_ext": ("byte", "kibi", "mebi", "gibi", "tebi", "pebi", "exbi", "zebi", "yobi"),
 }
 
 
-def bytes2human(n, format='%(value).1f%(symbol)s', symbols='customary'):
+def bytes2human(n, format="%(value).1f%(symbol)s", symbols="customary"):
     """
     Convert n bytes into a human readable string based on format.
     symbols can be either "customary", "customary_ext", "iec" or "iec_ext",
@@ -63,7 +68,7 @@ def bytes2human(n, format='%(value).1f%(symbol)s', symbols='customary'):
     symbols = SYMBOLS[symbols]
     prefix = {}
     for i, s in enumerate(symbols[1:]):
-        prefix[s] = 1 << (i+1)*10
+        prefix[s] = 1 << (i + 1) * 10
     for symbol in reversed(symbols[1:]):
         if n >= prefix[symbol]:
             value = float(n) / prefix[symbol]
@@ -95,23 +100,22 @@ def simpelbytes2human(n):
     # '9.8K'
     # >>> bytes2human(100001221)
     # '95.4M'
-    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    symbols = ("K", "M", "G", "T", "P", "E", "Z", "Y")
     prefix = {}
     for i, s in enumerate(symbols):
         prefix[s] = 1 << (i + 1) * 10
     for s in reversed(symbols):
         if n >= prefix[s]:
             value = float(n) / prefix[s]
-            return '%.1f%s' % (value, s)
+            return "%.1f%s" % (value, s)
     return "%sB" % n
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
-
-    assert('0B' == get_human_size(0))
-    assert('1.00KB' == get_human_size(1024))
-    assert('1.12KB' == get_human_size(1024+1024*0.12))
+    assert "0B" == get_human_size(0)
+    assert "1.00KB" == get_human_size(1024)
+    assert "1.12KB" == get_human_size(1024 + 1024 * 0.12)
 
 
 #    print(f'Class {myver.__class__.__name__} completed test successfully')

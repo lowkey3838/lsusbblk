@@ -4,8 +4,8 @@
 # file system. It will also install python dependencies and create a tar ball. 
 # This file is inteded to be used during development.
 #
-# Author: Olof Söderström    
-# Email: olof.soderstrom@bahnhof.se
+# Author: Lowkey 
+# Email: public3838@bahnhof.se
 # Licese: GPLv3
 # Version: 1.0
 #

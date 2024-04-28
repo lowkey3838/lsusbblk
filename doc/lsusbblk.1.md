@@ -94,20 +94,22 @@ the \--device parameter
 0. Successful program execution
 1. Program exited with an error
 
-# EXAMPLE
+# EXAMPLES
 
-## Default behaviour
+**Default behaviour**
+
 ```bash
-
+$ lsusbblk
 ```
-**lsusbblk**
 
 Results in either "No USB block devices found" or a list of attached USB
 block devices with default properties displayed.
 
-## Wait for new device to be attached
+**Wait for new device to be attached**
    
-**lsusbblk \--follow**
+```bash
+$ lsusbblk --follow
+```
 
 The program will present currently attached devices and then wait for a
 new device to be attached. If a device is removed the device name will
@@ -115,25 +117,30 @@ be presented and the program will continue to wait for a new device.
 When a device is detected then the device will be resented and the
 program exits.
 
-## Display selected properties
+**Display selected properties**
 
-**lsusbblk \--properties "device driver vendor_enc model_enc revision
-pid vid serial_long chksum"**
+```bash
+$ lsusbblk --properties "device driver vendor_enc model_enc revision pid vid serial_long chksum"
+```
 
 The program will present currently attached devices with the given
 properties.
 
-## Display a specific property for a specific device
+**Display a specific property for a specific device**
 
-**lsusbblk \--device /dev/sdc \--properties \"chksum\" \--quiet**
+```bash
+$ lsusbblk --device /dev/sdc --properties "chksum" --quiet
+```
 
 The program will present the computed checksum of the devices
 properties, see NOTES, and exit. This could for instance be used in a
 shell script.
 
-## Display newly inserted device by name
+**Display newly inserted device by name**
 
-**lsusbblk -q -f -p device**
+```bash
+$ lsusbblk -q -f -p device
+```
 
 The program waits for a newly inserted device, present the device name
 and exit.

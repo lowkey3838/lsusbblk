@@ -1,32 +1,41 @@
+"""
+This module provides a class that parses and updates the default values with the 
+values give from the command line.
+"""
+
 from dataclasses import dataclass
 from argparse import ArgumentParser
 
-
-class CustomArgumentParser(ArgumentParser):
-    def print_help(self, file=None):
-        # Custom help message
-        custom_help = """
-        Custom Help Message:
-        ====================
-        This is a custom help message for your program.
-        You can add your own detailed description and usage instructions here.
-        """
-        self._print_message(custom_help + "\n", file)
+# class CustomArgumentParser(ArgumentParser):
+#     def print_help(self, file=None):
+#         # # Custom help message
+#         # custom_help = """
+#         # Custom Help Message:
+#         # ====================
+#         # This is a custom help message for your program.
+#         # You can add your own detailed description and usage instructions here.
+#         # """
+#         # self._print_message(custom_help + "\n", file)
+#
+#         # print(self.__dict__)
+#         # print(self.__dict__["_actions"])
+#
 
 
 @dataclass
 class conf:
+    """Parsing and storing command line swithes and options"""
+
     name: str
     version: str
     author: str
     copyright: str
-    args = None
 
     def __post_init__(self):
+        """Customised command line configuration"""
 
-        # Command line options
-        # ap = ArgumentParser(
-        ap = CustomArgumentParser(
+        # ap = CustomArgumentParser(
+        ap = ArgumentParser(
             description=f"{self.name} {self.version} options and swithes",
             epilog=f"{self.author} {self.copyright}",
         )
@@ -65,10 +74,10 @@ class conf:
 
 
 if __name__ == "__main__":
+
     print("test test")
-    c = conf("lssss", version="1.2.3", author="liam", copyright="yepp mine")
+    c = conf(name="my_app", version="1.2.3", author="lowkey", copyright="yepp mine")
     print(c.name)
     print(c.__dict__)
     print(f"{c.debug=}")
     print(f"{dir(c)=}")
-    print(f"{dir(c.args)=}")

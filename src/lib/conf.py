@@ -27,16 +27,30 @@ class conf:
     """Parsing and storing command line swithes and options"""
 
     name: str
-    version: str
+    ver: str
     author: str
     copyright: str
+    version: bool = False
+    list: bool = False
+    nodevices: bool = False
+    usblist: bool = False
+    follow: bool = False
+    long: bool = False
+    quiet: bool = False
+    verbose: bool = False
+    scientific: bool = False
+    json: bool = False
+    monochrome: bool = False
+    debug: bool = False
+    device: str | None = None
+    properties: str | None = None
 
     def __post_init__(self):
         """Customised command line configuration"""
 
         # ap = CustomArgumentParser(
         ap = ArgumentParser(
-            description=f"{self.name} {self.version} options and swithes",
+            description=f"{self.name} {self.ver} options and swithes",
             epilog=f"{self.author} {self.copyright}",
         )
 
@@ -76,7 +90,7 @@ class conf:
 if __name__ == "__main__":
 
     print("test test")
-    c = conf(name="my_app", version="1.2.3", author="lowkey", copyright="yepp mine")
+    c = conf(name="my_app", ver="1.2.3", author="lowkey", copyright="yepp mine")
     print(c.name)
     print(c.__dict__)
     print(f"{c.debug=}")

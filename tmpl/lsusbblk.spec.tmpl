@@ -1,0 +1,60 @@
+
+Summary: Utility for listing attached USB block devices and script automation
+Name: __NAME__
+Version: __VERSION__
+# Release: __RELEASE__
+Release: 1
+License: GPL
+Group: Utilities/System
+URL: https://github.com/lowkey3838/lsusbblk.git
+SOURCE0: __TAR__ 
+Vendor: None
+Packager: Lowkey <public3838@bahnhof.se>
+Requires: python3-colorama python3-pyudev python3-pyusb 
+BuildRequires: python3-devel
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
+BuildArchitectures: noarch
+Prefix: /usr
+
+%description
+Utility for listing attached USB block devices and script automation. The utility
+collects informaiton about the device from udev and usb subsystem to present in a
+summarised form, individual values or as json string. The utility is inteded to be
+used at the command line or from a script.
+
+%prep
+%setup -q -n %{name} -c %{name}
+
+%build
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR="$RPM_BUILD_ROOT"
+
+%files
+%defattr(-,root,root)
+#%doc README CHANGELOG NEWS LICENSE
+%doc README.md LICENSE
+%{prefix}/share/lsusbblk/lsusbblk
+%{prefix}/share/lsusbblk/lib/conf.py
+%{prefix}/share/lsusbblk/lib/usbblk.py
+%{prefix}/share/lsusbblk/lib/confutil.py
+%{prefix}/share/lsusbblk/lib/formatutil.py
+%{prefix}/share/man/man1/lsusbblk.1.gz
+
+%post
+if [ ! -d /usr/share/lsusbblk ] ; then
+  /bin/mkdir /usr/share/lsusbblk
+fi
+/bin/chmod 755 /usr/share/lsusbblk
+
+if [ ! -e /usr/bin/lsusbblk ] ; then
+  /bin/ln --symbolic /usr/share/lsusbblk/lsusbblk /usr/bin/lsusbblk
+fi
+
+%changelog
+* Sun Jan 2 2022 Lowkey <public3838@bahnhof.se>
+
+- First version of spec file.
+
+

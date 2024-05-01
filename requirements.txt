@@ -1,0 +1,17 @@
+make
+grep
+coreutils
+findutils
+rpmlint
+flake8
+python3-flake8
+pylint
+python3-pylint
+mypy
+python3-mypy
+tar
+pandoc
+gzip
+sed
+rpm-build
+

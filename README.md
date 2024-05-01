@@ -4,7 +4,7 @@
 usb block devices (*usb memmory sticks or disks*) that has been connected to the computer.
 The ultimate goal has been to identify the device and what the device claimes to be, as 
 opposed to, what the device has negotiated with the operating system. This is not achieved
-possibly not achivable without adding special hardware.
+and is possibly not achivable without adding special hardware.
 
 The application is a command line utility that displays information to the user about the
 connected usb block devices. It can also be used to wait for the next device to be attached.

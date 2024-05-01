@@ -1,9 +1,10 @@
 # lsusbblk
 
-**lsusbblk** is the result of a personal itch to simplify know more about the attached
+**lsusbblk** is the result of a personal itch to simply know more about the attached
 usb block devices (*usb memmory sticks or disks*) that has been connected to the computer.
 The ultimate goal has been to identify the device and what the device claimes to be, as 
-opposed to, what the device has negotiated with the operating system.
+opposed to, what the device has negotiated with the operating system. This is not achieved
+possibly not achivable without adding special hardware.
 
 The application is a command line utility that displays information to the user about the
 connected usb block devices. It can also be used to wait for the next device to be attached.
@@ -65,9 +66,4 @@ Create the build enviorment.
 ```bash
 make
 ```
-
-'sudo dnf install rpmlint'
-'sudo dnf install @development-tools rpmdevtools'
-
-
 

@@ -20,17 +20,17 @@ endef
 NAME      := lsusbblk
 SRC			  := src
 DOC			  := doc
+TMPL			:= tmpl
 MAIN      := $(SRC)/$(NAME)
 SPEC      := $(NAME).spec
-SPECTEMPL := $(SPEC).tmpl
+SPECTEMPL := $(TMPL)/$(SPEC).tmpl
 TAR       := $(NAME).tgz
 
-VERSION := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
-RELEASE := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
+VERSION   := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
+RELEASE   := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
 
 LIBSRC    := $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
-#SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1 $(PYSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1.md $(PYSRC)
 RES       := $(SPEC) $(DOC)/lsusbblk.1 lsusbblk.1.gz
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
@@ -83,7 +83,7 @@ lint_py:
 	@echo $(call print,"--- lint python ---")
 	flake8 --exit-zero $(PYSRC)
 	pylint-3 $(PYSRC)
-	mypy   $(PYSRC)
+	mypy $(PYSRC)
 
 install:
 	@echo $(call print,"installing ...")
@@ -105,7 +105,6 @@ all: $(RPM_TARG)
 	@echo $(call p_targ)
 	@ls -gGhF --color RPMS/noarch
 	@echo $(call print,"------------")
-	@echo $(call print," ")
 
 $(TAR): $(SRC) $(RES)
 	@echo $(call p_targ)
@@ -121,7 +120,7 @@ $(NAME).1.gz: $(DOC)/$(NAME).1
 
 $(SPEC): $(SPECTEMPL) $(MAIN)
 	@echo $(call p_targ)
-	@cat $(SPECTEMPL) | \
+	cat $(SPECTEMPL) | \
 		sed 's/__NAME__/$(NAME)/g' | \
 		sed 's/__VERSION__/$(VERSION)/g' | \
 		sed 's/__RELEASE__/$(RELEASE)/g' | \

@@ -36,7 +36,6 @@ import struct
 import codecs
 from collections import namedtuple
 from hashlib import sha256
-from lib.confutil import Version as Ver  # Version number string
 from lib.formatutil import get_human_size  # Size into KB, MB and so on
 
 property_to_attribute = {
@@ -403,5 +402,5 @@ class usbblk:
 
 if __name__ == "__main__":
 
-    myusb = usbblk()
+    myusb = usbblk(True)
     myusb.debug()

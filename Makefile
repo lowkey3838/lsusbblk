@@ -29,7 +29,7 @@ TAR       := $(NAME).tgz
 VERSION   := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
 RELEASE   := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
 
-LIBSRC    := $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
+LIBSRC    := $(SRC)/lib/output.py $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1.md $(PYSRC)
 RES       := $(SPEC) $(DOC)/lsusbblk.1 lsusbblk.1.gz

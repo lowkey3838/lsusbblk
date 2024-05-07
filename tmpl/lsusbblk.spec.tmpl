@@ -2,8 +2,8 @@
 Summary: Utility for listing attached USB block devices and script automation
 Name: __NAME__
 Version: __VERSION__
-# Release: __RELEASE__
-Release: 1
+#### Release: __RELEASE__
+Release: 2
 License: GPL
 Group: Utilities/System
 URL: https://github.com/lowkey3838/lsusbblk.git
@@ -14,7 +14,6 @@ Requires: python3-colorama python3-pyudev python3-pyusb
 BuildRequires: python3-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}
 BuildArchitectures: noarch
-Prefix: /usr
 
 %description
 Utility for listing attached USB block devices and script automation. The utility
@@ -33,15 +32,15 @@ make install DESTDIR="$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-#%doc README CHANGELOG NEWS LICENSE
+### %doc README CHANGELOG NEWS LICENSE
 %doc README.md LICENSE
-%{prefix}/share/lsusbblk/lsusbblk
-%{prefix}/share/lsusbblk/lib/conf.py
-%{prefix}/share/lsusbblk/lib/usbblk.py
-%{prefix}/share/lsusbblk/lib/confutil.py
-%{prefix}/share/lsusbblk/lib/formatutil.py
-%{prefix}/share/lsusbblk/lib/output.py
-%{prefix}/share/man/man1/lsusbblk.1.gz
+%{_datadir}/lsusbblk/lsusbblk
+%{_datadir}/lsusbblk/lib/conf.py
+%{_datadir}/lsusbblk/lib/usbblk.py
+%{_datadir}/lsusbblk/lib/confutil.py
+%{_datadir}/lsusbblk/lib/formatutil.py
+%{_datadir}/lsusbblk/lib/output.py
+%{_mandir}/man1/lsusbblk.1.gz
 
 %post
 if [ ! -d /usr/share/lsusbblk ] ; then
@@ -54,6 +53,10 @@ if [ ! -e /usr/bin/lsusbblk ] ; then
 fi
 
 %changelog
+* Sun May 5 2024 Lowkey <public3838@bahnhof.se>
+
+- Changes to adheare to Fedora packing requirments
+
 * Sun Jan 2 2022 Lowkey <public3838@bahnhof.se>
 
 - First version of spec file.

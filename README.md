@@ -19,15 +19,15 @@ The application is also created to be easy to utilise in shell scripting.
 ```bash
 user@computer:~/$ lsusbblk -l
  
-DEVICE   | USBVER  | VENDOR | MODEL   | ID        | SIZE | SERIAL       | LABEL | 
--------- + ------- + ------ + ------- + --------- + ---- + ------------ + ----- + 
-/dev/sdd | USB 3.2 | ROG    | ESD-S1C | 0b05:1932 | 0    | MBD0AP009494 | None  | 
+DEVICE   | USBVER  | VENDOR | MODEL   | ID        | SIZE   | SERIAL       | LABEL | 
+-------- + ------- + ------ + ------- + --------- + ------ + ------------ + ----- + 
+/dev/sdd | USB 3.2 | ROG    | ESD-S1C | 0b05:1932 | 465.8G | MBD0AP009494 | None  | 
 ```
 
 ### Return a JSON formated string
 ```bash
-user@computer:~/$ lsusbblk -l -J
-{"/dev/sdd":{"device":"/dev/sdd","usbver":"USB 3.2","vendor":"ROG","model":"ESD-S1C","id":"0b05:1932","size":"0","serial":"MBD0AP009494","label":"None"}}
+user@computer:~/$ lsusbblk -J
+{"/dev/sdd":{"device":"/dev/sdd","vendor":"ROG","model":"ESD-S1C","size":"465.8G","label":"None"}}
 ```
 
 ### Wait for new device and display the device as a string

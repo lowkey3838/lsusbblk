@@ -14,4 +14,4 @@ pandoc
 gzip
 sed
 rpm-build
-
+bandit

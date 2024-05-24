@@ -11,16 +11,16 @@ P="[44m"
 S="[00m"
 print=$P$(1)$S
 p_targ=$PMaking $@ ...$S
- 
+
 define cp_src2targ
   @echo $(call p_targ)
   @cp $? $@
 endef
 
 NAME      := lsusbblk
-SRC			  := src
-DOC			  := doc
-TMPL			:= tmpl
+SRC       := src
+DOC       := doc
+TMPL      := tmpl
 MAIN      := $(SRC)/$(NAME)
 SPEC      := $(NAME).spec
 SPECTEMPL := $(TMPL)/$(SPEC).tmpl
@@ -29,28 +29,41 @@ TAR       := $(NAME).tgz
 VERSION   := $(shell grep ^__version__ $(SRC)/$(NAME) | cut -d '=' -f 2 | grep -o [0-9\.a-z]\*)
 RELEASE   := $(shell grep ^Release $(SPECTEMPL) | cut -d ':' -f 2 | grep -o [0-9]\*)
 
-LIBSRC    := $(SRC)/lib/output.py $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
+LIBSRC    := $(SRC)/lib/output.py $(SRC)/lib/conf.py $(SRC)/lib/usbblk.py \
+				 $(SRC)/lib/confutil.py $(SRC)/lib/formatutil.py
 PYSRC     := $(SRC)/$(NAME) $(LIBSRC)
 SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1.md $(PYSRC)
 RES       := $(SPEC) $(DOC)/lsusbblk.1 lsusbblk.1.gz
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
 
-$(warning ------------------------------------------------------------------------------)
-$(warning Current workning directory = $(shell pwd))
-$(warning Application = $(NAME))
-$(warning Version     = $(VERSION))
-$(warning Release     = $(RELEASE))
-$(warning SPEC        = $(SPEC))
-$(warning SPECTEMPL   = $(SPECTEMPL))
-$(warning RPM target  = $(RPM_TARG))
+# $(warning ------------------------------------------------------------------------------)
+# $(warning Current workning directory = $(shell pwd))
+# $(warning Application = $(NAME))
+# $(warning Version     = $(VERSION))
+# $(warning Release     = $(RELEASE))
+# $(warning SPEC        = $(SPEC))
+# $(warning SPECTEMPL   = $(SPECTEMPL))
+# $(warning RPM target  = $(RPM_TARG))
+# $(warning ------------------------------------------------------------------------------)
 
 ##############################################################################
 ### Commands                                                               ###
 ##############################################################################
 
-.PHONY: all setup clean clean_all lint lint_rpm lint_py install
+.PHONY: all help setup clean clean_all lint lint_rpm lint_py install
 
 first: all
+
+help:
+	@echo " "
+	@echo $(call print,"make setup     : Create directories for building RPM")
+	@echo $(call print,"make clean     : Clear all build artifacts")
+	@echo $(call print,"make clean_all : Removes build artifacts and build directories")
+	@echo $(call print,"make lint      : Perform lint on rpm-spec and python files")
+	@echo $(call print,"make sec       : Perform a static security analysis of the python code")
+	@echo $(call print,"make           : Make the rpm file")
+	@echo $(call print,"make install   : Install result directly using install script")
+	@echo " "
 
 setup:
 	@echo $(call print,"--- setup ---")
@@ -68,9 +81,11 @@ clean:
 
 clean_all: clean
 	@echo $(call print,"--- clean all ---")
-	@rm -frv RPMS
-	@rmdir -v BUILD BUILDROOT SRPMS SPECS SOURCES
+	@rm -frv RPMS BUILD BUILDROOT SRPMS SPECS SOURCES
 	@rm -frv .mypy_cache 
+
+sec:
+	@bandit -q -r $(PYSRC) --format custom --msg-template "{abspath}:{line}: {test_id}[bandit]: {severity}: {msg}"
 
 lint: lint_rpm lint_py
 	@echo $(call print,"--- lint ---")

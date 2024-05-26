@@ -1,13 +1,16 @@
 # NAME
+
 lsusbblk - list USB block devices
 
 # SYNOPSIS
+
 lsusbblk \[OPTIONS\]
 
-\[OPTIONS\]: \[-h\] \[-V\] \[-L\] \[-N\] \[-f\] \[-u\] \[-l\] \[-q\] \[-v\] 
-             \[-s\] \[-J\] \[-M\] \[-d\] \[-D DEVICE\] \[-p PROPERTIES_LIST\]
+\[OPTIONS\]: \[-h\] \[-V\] \[-L\] \[-N\] \[-f\] \[-u\] \[-l\] \[-q\] \[-v\]
+\[-s\] \[-J\] \[-M\] \[-d\] \[-D DEVICE\] \[-p PROPERTIES_LIST\]
 
 # DESCRIPTION
+
 **lsusbblk** is a command line program that lists attached USB block
 devices such as USB memory sticks or USB external disks. The purpose of
 the program is to simplify the identification of attached USB block
@@ -17,9 +20,10 @@ set of all available properties. The program can also be used to
 retrieve a specific value or several values from a specified device.
 
 # OPTIONS
+
 The following options are recognized:
 
-**\--device** DEVICE, **-D** DEVICE 
+**\--device** DEVICE, **-D** DEVICE
 
     Display information only for given device.
 
@@ -106,7 +110,7 @@ Results in either "No USB block devices found" or a list of attached USB
 block devices with default properties displayed.
 
 **Wait for new device to be attached**
-   
+
 ```bash
 $ lsusbblk --follow
 ```
@@ -150,13 +154,13 @@ and exit.
 The property \"chksum\" is a sha256 checksum of concatenated string
 representation of the following properties:
 
- \'bus\', \'devtype\', \'type\', \'driver\', \'drive_thumb\', \'vendor\', \'vendor_enc\', \'model\', \'model_enc\', \'revision\', \'size\', \'vid\', \'pid\', \'serial\', \'serial_long\', \'interfaces\', \'interface_num\'
+\'bus\', \'devtype\', \'type\', \'driver\', \'drive_thumb\', \'vendor\', \'vendor_enc\', \'model\', \'model_enc\', \'revision\', \'size\', \'vid\', \'pid\', \'serial\', \'serial_long\', \'interfaces\', \'interface_num\'
 
-:   
+:
 
- When displaying devices in the short form and the terminal is to short then the line will be truncated with \" \... \" line inserted at the middle. This is supported down to a column width of 30 characters.
+When displaying devices in the short form and the terminal is to short then the line will be truncated with \" \... \" line inserted at the middle. This is supported down to a column width of 30 characters.
 
-:   
+:
 
 # SECURITY
 

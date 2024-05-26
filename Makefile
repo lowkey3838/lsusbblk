@@ -36,21 +36,11 @@ SRC       := Makefile README.md LICENSE $(DOC)/lsusbblk.1.md $(PYSRC)
 RES       := $(SPEC) $(DOC)/lsusbblk.1 lsusbblk.1.gz
 RPM_TARG  := RPMS/noarch/$(NAME)-$(VERSION)-$(RELEASE).noarch.rpm
 
-# $(warning ------------------------------------------------------------------------------)
-# $(warning Current workning directory = $(shell pwd))
-# $(warning Application = $(NAME))
-# $(warning Version     = $(VERSION))
-# $(warning Release     = $(RELEASE))
-# $(warning SPEC        = $(SPEC))
-# $(warning SPECTEMPL   = $(SPECTEMPL))
-# $(warning RPM target  = $(RPM_TARG))
-# $(warning ------------------------------------------------------------------------------)
-
 ##############################################################################
 ### Commands                                                               ###
 ##############################################################################
 
-.PHONY: all help setup clean clean_all lint lint_rpm lint_py install
+.PHONY: all help setup clean clean_all sec lint lint_rpm lint_py install
 
 first: all
 

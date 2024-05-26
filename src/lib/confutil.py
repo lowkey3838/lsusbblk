@@ -103,77 +103,78 @@ if __name__ == "__main__":
 
     # Init
     myver = Version("v1.0.2")
-    assert str(myver) == "1.0.2"
-    assert myver.__repr__() == "Version('1.0.2')"
+    assert str(myver) == "1.0.2"  # nosec B101
+    assert myver.__repr__() == "Version('1.0.2')"  # nosec B101
+
     myver = Version(1)
-    assert myver.get() == "1.0.0"
+    assert myver.get() == "1.0.0"  # nosec B101
     myver = Version("v1.2")
-    assert myver.get() == "1.2.0"
-    myver = Version("1.2.3")
-    assert myver.get() == "1.2.3"
+    assert myver.get() == "1.2.0"  # nosec B101
+    myver = Version("1.2.3")  # nosec B101
+    assert myver.get() == "1.2.3"  # nosec B101
     myver.set("v3.2")
-    assert myver.get() == "3.2.0"
+    assert myver.get() == "3.2.0"  # nosec B101
 
     # Set
     myver.set("10")
-    assert myver.get() == "10.0.0"
+    assert myver.get() == "10.0.0"  # nosec B101
     myver.set("v11")
-    assert myver.get() == "11.0.0"
+    assert myver.get() == "11.0.0"  # nosec B101
     myver.set("12.13.14")
-    assert myver.get() == "12.13.14"
+    assert myver.get() == "12.13.14"  # nosec B101
 
     # Set values
     myver.set_values(3)
-    assert myver.get() == "3.0.0"
+    assert myver.get() == "3.0.0"  # nosec B101
     myver.set_values(3, 2)
-    assert myver.get() == "3.2.0"
+    assert myver.get() == "3.2.0"  # nosec B101
     myver.set_values(3, 2, 1)
-    assert myver.get() == "3.2.1"
+    assert myver.get() == "3.2.1"  # nosec B101
 
     # Get part
     myver = Version("1.2.3")
-    assert myver.major() == 1
-    assert myver.minor() == 2
-    assert myver.patch() == 3
+    assert myver.major() == 1  # nosec B101
+    assert myver.minor() == 2  # nosec B101
+    assert myver.patch() == 3  # nosec B101
 
     # Set part
     myver.major(9)
-    assert myver.get() == "9.2.3"
+    assert myver.get() == "9.2.3"  # nosec B101
     myver.minor(8)
-    assert myver.get() == "9.8.3"
+    assert myver.get() == "9.8.3"  # nosec B101
     myver.patch(7)
-    assert myver.get() == "9.8.7"
+    assert myver.get() == "9.8.7"  # nosec B101
 
     # Equality
-    assert myver.equal("9.8.7")
-    assert myver.notequal("1.0.0")
+    assert myver.equal("9.8.7")  # nosec B101
+    assert myver.notequal("1.0.0")  # nosec B101
 
     # Compatibility
     myver = Version("10.20.30")
-    assert myver.incompatible("11")
-    assert myver.incompatible("9")
-    assert myver.incompatible("10") is False
+    assert myver.incompatible("11")  # nosec B101
+    assert myver.incompatible("9")  # nosec B101
+    assert myver.incompatible("10") is False  # nosec B101
 
-    assert myver.compatible("11") is False
-    assert myver.compatible("9") is False
-    assert myver.compatible("10") is False
-    assert myver.compatible("10.20")
-    assert myver.compatible("10.20.30")
-    assert myver.compatible("10.20.1")
-
-    myver = Version("3.2.1")
-    assert myver.degraded("1.0.0") is False
-    assert myver.degraded("3.0.0") is False
-    assert myver.degraded("3.2.0")
-    assert myver.degraded("3.2.1")
-    assert myver.degraded("3.2.2")
+    assert myver.compatible("11") is False  # nosec B101
+    assert myver.compatible("9") is False  # nosec B101
+    assert myver.compatible("10") is False  # nosec B101
+    assert myver.compatible("10.20")  # nosec B101
+    assert myver.compatible("10.20.30")  # nosec B101
+    assert myver.compatible("10.20.1")  # nosec B101
 
     myver = Version("3.2.1")
-    assert myver.interoperable("3.2.1") == "compatible"
-    assert myver.interoperable("2.0.0") == "incompatible"
-    assert myver.interoperable("4.0.0") == "incompatible"
-    assert myver.interoperable("4.2.1") == "incompatible"
-    assert myver.interoperable("3.2.0") == "degraded"
-    assert myver.interoperable("3.2.2") == "degraded"
+    assert myver.degraded("1.0.0") is False  # nosec B101
+    assert myver.degraded("3.0.0") is False  # nosec B101
+    assert myver.degraded("3.2.0")  # nosec B101
+    assert myver.degraded("3.2.1")  # nosec B101
+    assert myver.degraded("3.2.2")  # nosec B101
+
+    myver = Version("3.2.1")
+    assert myver.interoperable("3.2.1") == "compatible"  # nosec B101
+    assert myver.interoperable("2.0.0") == "incompatible"  # nosec B101
+    assert myver.interoperable("4.0.0") == "incompatible"  # nosec B101
+    assert myver.interoperable("4.2.1") == "incompatible"  # nosec B101
+    assert myver.interoperable("3.2.0") == "degraded"  # nosec B101
+    assert myver.interoperable("3.2.2") == "degraded"  # nosec B101
 
     print(f"Class {myver.__class__.__name__} completed test successfully")

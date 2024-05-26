@@ -113,9 +113,9 @@ def simpelbytes2human(n):
 
 if __name__ == "__main__":
 
-    assert "0B" == get_human_size(0)
-    assert "1.00KB" == get_human_size(1024)
-    assert "1.12KB" == get_human_size(1024 + 1024 * 0.12)
+    assert "0B" == get_human_size(0)  # nosec B101
+    assert "1.00KB" == get_human_size(1024)  # nosec B101
+    assert "1.12KB" == get_human_size(1024 + 1024 * 0.12)  # nosec B101
 
 
 #    print(f'Class {myver.__class__.__name__} completed test successfully')

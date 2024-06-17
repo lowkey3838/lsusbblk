@@ -1,41 +1,28 @@
 #!/usr/bin/python3
-#
-# This module defines the classes used for scan and enumerate usb mass store.
-# Devices properties are store.
-#
-# usbblk.py
-#
-# -*- Mode: Python; coding: utf-8; indent-tabs-mode: t; -*-
-# -*- Mode: Python; c-basic-offset: 4; tab-width: 4 -*-
-#
-# ----------------------------------------------------------------------------
-#
-# Add demo dir's parent to sys path, so that 'import colorama' always finds
-# the local source in preference to any installed version of colorama.
-#
-# Windows device instance ID
-# instance-ID + device-ID (instance-specific-DI) ==>
-#   device-ID\instance-specific-ID
-# For example :from PCI\VEN_1000&DEV_0001&SUBSYS_00000000&REV_02\1&08
-#
-# Device id : VEN_1000&DEV_0001&SUBSYS_00000000&REV_02 and instance id =  1&08 (unique id)
-#
-# import sys
-# from os.path import normpath, dirname, join
-# local_colorama_module = normpath(join(dirname(__file__), '..'))
-# sys.path.insert(0, local_colorama_module)
-#
+"""
+    This module defines the classes used for scan and enumerate usb mass store.
+    Devices properties are store.
 
-import os
+    usbblk.py
+
+    -*- Mode: Python; coding: utf-8; indent-tabs-mode: t; -*-
+    -*- Mode: Python; c-basic-offset: 4; tab-width: 4 -*-
+
+    ----------------------------------------------------------------------------
+"""
+
+import codecs
+import fcntl
 import json
+import os
+import struct
+from collections import namedtuple
+from hashlib import sha256
+
 import pyudev
 import usb.core
 import usb.util
-import fcntl
-import struct
-import codecs
-from collections import namedtuple
-from hashlib import sha256
+
 from lib.formatutil import get_human_size  # Size into KB, MB and so on
 
 property_to_attribute = {
@@ -138,15 +125,15 @@ def get_raw_device_size(device_path):
     try:
         with open(device_path) as dev:
             buf = fcntl.ioctl(dev.fileno(), req, buf)
-        bytes = struct.unpack("L", buf)[0]
+        bytes_found = struct.unpack("L", buf)[0]
 
-        return bytes
+        return bytes_found
     except (OSError, PermissionError):
         return 0
 
 
 def shasum(line):
-    """make sha256 digest of line"""
+    """Make sha256 digest of line"""
     h = sha256()
     h.update(line.encode())
     return h.hexdigest()
@@ -210,13 +197,6 @@ class usbids:
                 pidstr = self.vendors[vid].devices[pid]
 
         return vidstr, pidstr
-
-
-class usbfs:
-    """Stub for class inspecting file systems"""
-
-    def __init__(self):
-        pass
 
 
 class usbdevice(keyvaluestore):
